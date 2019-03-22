@@ -1,52 +1,111 @@
 package com.company;
+// Java implementation for multithreaded chat client
+// Save file as Main.java
 
 import java.io.*;
-import java.net.Socket;
+import java.net.*;
 import java.util.Scanner;
 
 public class Main {
-
-    public static void main(String[] args) {
-//        System.out.println("aa");
-//        Scanner sc = new Scanner(System.in);
-//        String i = sc.next();
-//        System.out.println(i);
-        String serverName = "127.0.0.1";
-        int port = 6666;
-
-        try {
-            Thread t = new Server(6666);
-            t.start();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+    private final static String HELP = "help";
+    private final static String MY_IP = "myip";
+    private final static String MY_PORT = "myport";
+    private final static String CONNECT = "connect";
+    private final static String LIST = "list";
+    private final static String TERMINATE = "terminate";
+    private final static String SEND = "send";
 
 
-        try {
-            System.out.println("Client connecting to " + serverName + " on port " + port);
-            Socket client = new Socket(serverName, port);
+    static String ip;
 
-            System.out.println("Client just connected to " + client.getRemoteSocketAddress());
-            OutputStream outToServer = client.getOutputStream();
-            DataOutputStream out = new DataOutputStream(outToServer);
+    public static void main(String args[]) throws UnknownHostException, IOException {
+        System.out.println("aassaa");
 
-            out.writeUTF("Hello from " + client.getLocalSocketAddress());
-            InputStream inFromServer = client.getInputStream();
-            DataInputStream in = new DataInputStream(inFromServer);
-            Scanner sc = new Scanner(System.in);
+        Runnable server = new Server(Integer.parseInt(args[0]));
+        new Thread(server).start();
+        Scanner scn = new Scanner(System.in);
 
-            System.out.println("Server says " + in.readUTF());
-            while (true) {
+        do {
 
-                out.writeUTF("From Client: " );
+            // read the message to deliver.
+            String msg = scn.nextLine();
+            String[] words = msg.split(" ");
 
-
-
+            switch (words[0]) {
+                case HELP:
+                    break;
+                case MY_IP:
+                    break;
+                case MY_PORT:
+                    break;
+                case CONNECT:
+                    initClientConnection("localhost",6666);
+                    break;
+                case LIST:
+                    break;
+                case TERMINATE:
+                    break;
+                case SEND:
+                    break;
             }
-            //client.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+
+        } while (scn.nextLine().equals("exit"));
+
 
     }
+
+    public static void initClientConnection(String ip, int port) throws UnknownHostException, IOException {
+        // getting localhost ip
+
+        // establish the connection
+        Socket s = new Socket(ip, port);
+        Scanner scn = new Scanner(System.in);
+
+        // obtaining input and out streams
+        DataInputStream dis = new DataInputStream(s.getInputStream());
+        DataOutputStream dos = new DataOutputStream(s.getOutputStream());
+
+        // sendMessage thread
+        Thread sendMessage = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                while (true) {
+
+                    // read the message to deliver.
+                    String msg = scn.nextLine();
+
+                    try {
+                        // write on the output stream
+                        dos.writeUTF(msg);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        });
+
+        // readMessage thread
+        Thread readMessage = new Thread(new Runnable() {
+            @Override
+            public void run() {
+
+                while (true) {
+                    try {
+                        // read the message sent to this client
+                        String msg = dis.readUTF();
+                        System.out.println(msg);
+                    } catch (IOException e) {
+
+                        e.printStackTrace();
+                    }
+                }
+            }
+        });
+
+        sendMessage.start();
+        readMessage.start();
+
+
+    }
+
 }
