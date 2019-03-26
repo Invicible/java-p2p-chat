@@ -4,7 +4,11 @@ package com.company;
 
 import java.io.*;
 import java.net.*;
+import java.util.Arrays;
 import java.util.Scanner;
+import java.util.Vector;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
 
 public class Main {
     private final static String HELP = "help";
@@ -14,96 +18,62 @@ public class Main {
     private final static String LIST = "list";
     private final static String TERMINATE = "terminate";
     private final static String SEND = "send";
-
-
-    static String ip;
+    private static BlockingQueue<Message> serverMessageQueue;
+    private  static BlockingQueue<Message> clientMessageQueue;
+    private static Vector<ConnectionObject> connectionList = new Vector<>();
+    static InetAddress myIP;
 
     public static void main(String args[]) throws UnknownHostException, IOException {
-        System.out.println("aassaa");
+        serverMessageQueue = new LinkedBlockingQueue<Message>();
+        clientMessageQueue = new LinkedBlockingQueue<Message>();
 
-        Runnable server = new Server(Integer.parseInt(args[0]));
+        Runnable server = new Server(6666,serverMessageQueue,connectionList);
         new Thread(server).start();
-        Scanner scn = new Scanner(System.in);
 
+
+
+        myIP = InetAddress.getLocalHost();
+
+
+
+        Scanner scn = new Scanner(System.in);
+        String msg;
         do {
 
             // read the message to deliver.
-            String msg = scn.nextLine();
-            String[] words = msg.split(" ");
+             msg = scn.nextLine();
+            String[] words = msg.split(" ",3);
 
             switch (words[0]) {
                 case HELP:
                     break;
                 case MY_IP:
+                    System.out.println("The IP address is " + InetAddress.getLocalHost().getHostAddress());
                     break;
                 case MY_PORT:
                     break;
                 case CONNECT:
-                    initClientConnection("localhost",6666);
+                    Runnable client = new Client(words[1],Integer.parseInt(words[2]),clientMessageQueue);
+                    new Thread(client).start();
                     break;
                 case LIST:
-                    break;
+
+                    for(ConnectionObject obj: connectionList){
+                        System.out.println(obj.getId());
+                        System.out.println(obj.getIp());
+                        System.out.println(obj.getPort());
+                        System.out.println(obj.getType());
+                    }
+                   break;
                 case TERMINATE:
+                    clientMessageQueue.offer(new Message(1,"hello theasdfsadfre"));
                     break;
                 case SEND:
+                    serverMessageQueue.offer(new Message(Integer.parseInt(words[1]),words[2]));
                     break;
             }
 
-        } while (scn.nextLine().equals("exit"));
-
-
-    }
-
-    public static void initClientConnection(String ip, int port) throws UnknownHostException, IOException {
-        // getting localhost ip
-
-        // establish the connection
-        Socket s = new Socket(ip, port);
-        Scanner scn = new Scanner(System.in);
-
-        // obtaining input and out streams
-        DataInputStream dis = new DataInputStream(s.getInputStream());
-        DataOutputStream dos = new DataOutputStream(s.getOutputStream());
-
-        // sendMessage thread
-        Thread sendMessage = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                while (true) {
-
-                    // read the message to deliver.
-                    String msg = scn.nextLine();
-
-                    try {
-                        // write on the output stream
-                        dos.writeUTF(msg);
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                }
-            }
-        });
-
-        // readMessage thread
-        Thread readMessage = new Thread(new Runnable() {
-            @Override
-            public void run() {
-
-                while (true) {
-                    try {
-                        // read the message sent to this client
-                        String msg = dis.readUTF();
-                        System.out.println(msg);
-                    } catch (IOException e) {
-
-                        e.printStackTrace();
-                    }
-                }
-            }
-        });
-
-        sendMessage.start();
-        readMessage.start();
+        } while (!msg.equals("exit"));
 
 
     }

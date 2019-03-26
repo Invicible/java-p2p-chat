@@ -8,7 +8,7 @@ import java.util.Scanner;
 
 public class a
 {
-    final static int ServerPort = 1234;
+    final static int ServerPort = 6666;
 
     public static void main(String args[]) throws UnknownHostException, IOException
     {

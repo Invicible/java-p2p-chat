@@ -6,18 +6,24 @@ package com.company;
 import java.io.*;
 import java.util.*;
 import java.net.*;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
 
 // Server class
 public class Server implements Runnable {
 
     // Vector to store active clients
     static Vector<ClientHandler> ar = new Vector<>();
+    BlockingQueue<Message> queue;
+    Vector<ConnectionObject> connectionList;
     private int port;
     // counter for clients
     static int i = 0;
 
-    public Server(int port) {
+    public Server(int port, BlockingQueue<Message> queue, Vector<ConnectionObject> connectionList) {
         this.port = port;
+        this.queue = queue;
+        this.connectionList = connectionList;
     }
 
     @Override
@@ -34,21 +40,20 @@ public class Server implements Runnable {
                 // Accept the incoming request
                 s = ss.accept();
 
-                System.out.println("New client request received : " + s);
+                System.out.println("The connection to peer " + s.getInetAddress() + "  is successfully established");
 
                 // obtain input and output streams
                 DataInputStream dis = new DataInputStream(s.getInputStream());
                 DataOutputStream dos = new DataOutputStream(s.getOutputStream());
 
-                System.out.println("Creating a new handler for this client...");
-
+                ConnectionObject connectionObject = new ConnectionObject(s.getInetAddress().toString(),s.getPort(),ConnectionObject.SERVER_TYPE);
                 // Create a new handler object for handling this request.
-                ClientHandler mtch = new ClientHandler(s, i, dis, dos);
+
+                ClientHandler mtch = new ClientHandler(s,  dis, dos,queue,connectionList,connectionObject);
 
                 // Create a new Thread with this object.
                 Thread t = new Thread(mtch);
 
-                System.out.println("Adding this client to active client list");
 
                 // add this client to active clients list
                 ar.add(mtch);
