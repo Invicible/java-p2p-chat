@@ -18,6 +18,8 @@ public class Main {
     private final static String LIST = "list";
     private final static String TERMINATE = "terminate";
     private final static String SEND = "send";
+    private final static String EXIT = "exit";
+
 
 
     private static BlockingQueue<Message> serverMessageQueue;
@@ -48,16 +50,7 @@ public class Main {
                 try {
                 switch (words[0]) {
                     case HELP:
-                        System.out.println("myip - Display IP address");
-                        System.out.println("myport - Display port number that the program runs on");
-                        System.out.println("connect $ip $port - Connect to another peer where $ip is the IP address and $port " +
-                                "is the Port number of that peer");
-                        System.out.println("list - List all active connections");
-                        System.out.println("send $id $message - Send a message to the peer with id=$id (can be found in connection list) " +
-                                "and a message=$message. Example 'send 2 Hello'");
-                        System.out.println("terminate $id - Terminate the connection with id=$id");
-
-
+                        displayHelp();
                         break;
                     case MY_IP:
                         System.out.println("The IP address is " + InetAddress.getLocalHost().getHostAddress());
@@ -81,6 +74,8 @@ public class Main {
                     case SEND:
                         handleSend(Integer.parseInt(words[1]), words[2]);
                         break;
+                    case EXIT:
+                            break;
                     default:
                         System.out.println("Command is not supported!!");
                 }
@@ -105,6 +100,17 @@ public class Main {
         }
         System.out.println("No connection with provided ID");
 
+    }
+
+    private static void displayHelp(){
+        System.out.println("myip - Display IP address");
+        System.out.println("myport - Display port number that the program runs on");
+        System.out.println("connect $ip $port - Connect to another peer where $ip is the IP address and $port " +
+                "is the Port number of that peer");
+        System.out.println("list - List all active connections");
+        System.out.println("send $id $message - Send a message to the peer with id=$id (can be found in connection list) " +
+                "and a message=$message. Example 'send 2 Hello'");
+        System.out.println("terminate $id - Terminate the connection with id=$id");
     }
 
 }

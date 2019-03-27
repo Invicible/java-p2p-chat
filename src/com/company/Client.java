@@ -53,9 +53,11 @@ public class Client implements Runnable {
                         // read the message sent to this client
                         String msg = dis.readUTF();
                         System.out.println("New message form " + s.getInetAddress() + " '" + msg + "'");
-                    } catch (IOException e) {
+                    } catch (Exception e) {
                         System.out.println("Connection with "+ s.getInetAddress() + " is terminated");
+                        break;
                     }
+
                 }
             }
         });
