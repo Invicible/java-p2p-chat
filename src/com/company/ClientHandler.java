@@ -35,11 +35,12 @@ class ClientHandler implements Runnable {
 
     @Override
     public void run() {
+        connectionList.add(connectionObject);
+
         // readMessage thread
         Thread readMessage = new Thread(new Runnable() {
             @Override
             public void run() {
-                connectionList.add(connectionObject);
                 while (true) {
                     try {
                         // read the message sent to this client
@@ -69,7 +70,7 @@ class ClientHandler implements Runnable {
                 if (messageObject != null && messageObject.getId() == connectionObject.getId()) {
 
 
-                    if (messageObject.getMessage().equals("logout")) {
+                    if (messageObject.getMessage().equals("terminate")) {
                         this.s.close();
                         break;
                     } else {
