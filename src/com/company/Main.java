@@ -42,8 +42,6 @@ public class Main {
         String msg;
 
             do {
-
-
                 // read the message to deliver.
                 msg = scn.nextLine();
                 String[] words = msg.split(" ", 3);

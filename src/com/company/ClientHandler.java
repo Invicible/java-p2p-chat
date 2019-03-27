@@ -74,7 +74,6 @@ class ClientHandler implements Runnable {
                         this.s.close();
                         break;
                     } else {
-                        System.out.println("sending message from server");
 
                         dos.writeUTF(messageObject.getMessage());
                         queue.remove(messageObject);
@@ -96,30 +95,3 @@ class ClientHandler implements Runnable {
         }
     }
 }
-
-
-//handle the data
-
-
-//                if (received.equals("logout")) {
-//                    this.isloggedin = false;
-//                    this.s.close();
-//                    break;
-//                }
-//
-//                // break the string into message and recipient part
-//                StringTokenizer st = new StringTokenizer(received, "#");
-//                String MsgToSend = st.nextToken();
-//                int recipient = Integer.parseInt(st.nextToken());
-//
-//                // search for the recipient in the connected devices list.
-//                // ar is the vector storing client of active users
-//                for (ClientHandler mc : Server.ar) {
-//                    // if the recipient is found, write on its
-//                    // output stream
-//                    if (mc.id == recipient && mc.isloggedin == true) {
-//                        mc.dos.writeUTF(this.id + " : " + MsgToSend);
-//                        break;
-//                    }
-//                }
-

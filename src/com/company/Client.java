@@ -52,10 +52,9 @@ public class Client implements Runnable {
                     try {
                         // read the message sent to this client
                         String msg = dis.readUTF();
-                        System.out.println(msg);
+                        System.out.println("New message form " + s.getInetAddress() + " '" + msg + "'");
                     } catch (IOException e) {
-
-                        e.printStackTrace();
+                        System.out.println("Connection with "+ s.getInetAddress() + " is terminated");
                     }
                 }
             }
@@ -74,7 +73,6 @@ public class Client implements Runnable {
                         this.s.close();
                         break;
                     } else {
-                        System.out.println("sending message from client");
 
                         dos.writeUTF(messageObject.getMessage());
                         queue.remove(messageObject);
